@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Конвертер</title>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <script th:src="@{/script.js}" defer></script>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <span>Конвертер</span>
+        <nav>
+            <a href="history">История</a>
+            <a href="help">Справка</a>
+        </nav>
+    </div>
+
+    <div class="converter">
+        <form action="/convert" method="post">
+            <input type="text" id="inputNumber" name="value1" th:value="${value1}" value="0" readonly>
+
+            <label>Основание с. сч. исходного числа
+                <input type="number" id="sourceBase" name="p1" th:value="${p1}" value="10" min="2" max="16"
+                       oninput="updateButtons()">
+            </label>
+
+            <input type="text" id="outputNumber" th:value="${result}" readonly>
+
+            <label>Основание с. сч. результата
+                <input type="number" id="targetBase" name="p2" th:value="${p2}" value="10" min="2" max="16">
+            </label>
+
+            <div class="buttons">
+                <button type="button" onclick="appendNumber('0')" class="num">0</button>
+                <button type="button" onclick="appendNumber('1')" class="num">1</button>
+                <button type="button" onclick="appendNumber('2')" class="num" th:classappend="${p1} != null and ${p1} < 3 ? 'disabled'">2</button>
+                <button type="button" onclick="appendNumber('3')" class="num" th:classappend="${p1} != null and ${p1} < 4 ? 'disabled'">3</button>
+                <button type="button" onclick="appendNumber('4')" class="num" th:classappend="${p1} != null and ${p1} < 5 ? 'disabled'">4</button>
+                <button type="button" onclick="appendNumber('5')" class="num" th:classappend="${p1} != null and ${p1} < 6 ? 'disabled'">5</button>
+                <button type="button" onclick="appendNumber('6')" class="num" th:classappend="${p1} != null and ${p1} < 7 ? 'disabled'">6</button>
+                <button type="button" onclick="appendNumber('7')" class="num" th:classappend="${p1} != null and ${p1} < 8 ? 'disabled'">7</button>
+                <button type="button" onclick="appendNumber('8')" class="num" th:classappend="${p1} != null and ${p1} < 9 ? 'disabled'">8</button>
+                <button type="button" onclick="appendNumber('9')" class="num" th:classappend="${p1} != null and ${p1} < 10 ? 'disabled'">9</button>
+                <button type="button" onclick="appendNumber('A')" class="num" id="btnA">A</button>
+                <button type="button" onclick="appendNumber('B')" class="num" id="btnB">B</button>
+                <button type="button" onclick="appendNumber('C')" class="num" id="btnC">C</button>
+                <button type="button" onclick="appendNumber('D')" class="num" id="btnD">D</button>
+                <button type="button" onclick="appendNumber('E')" class="num" id="btnE">E</button>
+                <button type="button" onclick="appendNumber('F')" class="num" id="btnF">F</button>
+
+                <button type="button" onclick="appendNumber('.')" class="num">.</button>
+                <button type="button" onclick="backspaceButton()" class="action" id="backspace">BS</button>
+                <button type="button" onclick="clearInput()" class="action" id="clear">CE</button>
+                <button type="submit" class="execute">Конвертировать</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
