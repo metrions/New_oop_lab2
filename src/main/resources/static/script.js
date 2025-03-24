@@ -1,23 +1,52 @@
 function appendNumber(num) {
     let inputField = document.getElementById("inputNumber");
-    fetch('/editor/digit', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'value=' + num
-    })
-        .then(response => response.text())
-        .then(data => {
-            console.log('Data from server:', data);
+    console.log(inputField.value);
+    if (num === '-' && inputField.value.length === 0 || num !== '-') {
+        fetch('/editor/digit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'value=' + num
         })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    if (inputField.value === "0") {
-        inputField.value = num;
-    } else {
-        inputField.value += num;
+            .then(response => response.text())
+            .then(data => {
+                console.log('Data from server:', data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        if (inputField.value === "0") {
+            inputField.value = num;
+        } else {
+            inputField.value += num;
+        }
+    }
+}
+
+function appendMinus() {
+    let inputField = document.getElementById("inputNumber");
+    console.log(inputField);
+    if (inputField.length === 0) {
+        fetch('/editor/digit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'value=' + num
+        })
+            .then(response => response.text())
+            .then(data => {
+                console.log('Data from server:', data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        if (inputField.value === "0") {
+            inputField.value = num;
+        } else {
+            inputField.value += num;
+        }
     }
 }
 

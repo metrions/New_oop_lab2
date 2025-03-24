@@ -1,6 +1,5 @@
 package com.example.ooplab1.service;
 
-import com.example.ooplab1.controller.Editor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

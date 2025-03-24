@@ -78,7 +78,7 @@ button.execute {
 }
 
 button.disabled {
-    background: #2e2d2d !important;
+    background: #605e5e !important;
     color: #1b1b1b !important;
     pointer-events: none;
     opacity: 0.5;

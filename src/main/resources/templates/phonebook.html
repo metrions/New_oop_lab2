@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Телефонная книга</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { width: 700px; margin: 20px auto; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .table-container { width: 80%; height: 320px; border: 1px solid #ccc; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ccc; padding: 5px; text-align: left; }
+        tr { cursor: pointer; }
+        tr:hover { background-color: #f0f0f0; }
+        .buttons { display: flex; flex-direction: column; align-items: flex-end; margin-left: 10px; }
+        .buttons button { width: 100px; margin: 2px 0; }
+        .form-group {
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 5px;
+        }
+        .form-group label {
+            width: 100px;
+            text-align: left;
+            padding-right: 10px;
+        }
+        .form-group input {
+            width: 200px;
+        }
+        .bottom-form { display: flex; justify-content: space-between; margin-left: 10px; margin-top: 5px; }
+        .row { display: flex; flex-direction: row; align-items: flex-start; }
+    </style>
+</head>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector("form[action='/add']");
+
+        if (!form) {
+            console.error("Форма не найдена!");
+            return;
+        }
+
+        form.addEventListener("submit", function (event) {
+            const phoneInput = form.querySelector("input[name='phone']");
+            const phone = phoneInput.value.trim();
+
+            if (isPhoneExists(phone)) {
+                alert("Этот номер уже существует!");
+                event.preventDefault(); // Остановка отправки формы
+            }
+        });
+
+        function isPhoneExists(phone) {
+            const rows = document.querySelectorAll("tbody tr");
+            for (let row of rows) {
+                const existingPhone = row.querySelector("td:last-child").textContent.trim();
+                if (existingPhone === phone) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    });
+</script>
+<body>
+<div class="container">
+    <p><a href="/help" target="_blank">📖 Справка</a></p>
+
+    <h3>Телефонная книга</h3>
+
+    <!-- Окно вывода контактов -->
+    <div class="row">
+        <div class="table-container">
+            <table>
+                <thead>
+                <tr>
+                    <th>ФИО</th>
+                    <th>Телефон</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="contact : ${contacts}" onclick="selectContact(this)">
+                    <td th:text="${contact.name}">Саша</td>
+                    <td th:text="${contact.phone}">233555</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Кнопки управления -->
+        <div class="buttons">
+            <button onclick="clearContacts()">Очистить</button>
+            <button onclick="deleteSelected()">Удалить</button>
+            <button onclick="openEditModal()">Изменить</button>
+        </div>
+    </div>
+
+    <!-- Форма добавления -->
+    <h4>Добавить контакт</h4>
+    <form th:action="@{/add}" method="post">
+        <div class="row">
+            <div>
+                <div class="form-group">
+                    <label>ФИО</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label>Номер</label>
+                    <input type="text" name="phone" required>
+                </div>
+            </div>
+            <div class="bottom-form">
+                <button type="submit">Добавить</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Всплывающее окно для редактирования -->
+    <div id="editModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; padding: 20px; border: 1px solid black;">
+        <h3>Изменить контакт</h3>
+        <form id="editForm" method="post" action="/edit">
+            <input type="hidden" name="oldName" id="oldName">
+            <input type="hidden" name="oldPhone" id="oldPhone">
+            <label>Новое ФИО:</label>
+            <input type="text" name="newName" id="newName" required>
+            <label>Новый телефон:</label>
+            <input type="text" name="newPhone" id="newPhone" required>
+            <button type="submit">Сохранить</button>
+            <button type="button" onclick="closeEditModal()">Отмена</button>
+        </form>
+    </div>
+
+    <!-- Форма поиска -->
+    <h4>Найти контакт</h4>
+    <form th:action="@{/search}" method="post">
+        <div class="row">
+            <div>
+                <div class="form-group">
+                    <input type="text" name="name" placeholder="Имя" />
+                </div>
+                <div class="form-group">
+                    <input type="text" name="phone" placeholder="Телефон" />
+                </div>
+            </div>
+            <div class="bottom-form">
+                <button type="submit">Найти</button>
+            </div>
+        </div>
+    </form>
+
+
+    <h4>Импорт/Экспорт</h4>
+    <form id="importForm" th:action="@{/importCSV}" method="post" enctype="multipart/form-data">
+        <div class="row">
+            <button type="button" onclick="document.getElementById('fileInput').click()">Импортировать</button>
+            <input type="file" id="fileInput" name="file" accept=".csv" required style="display: none" onchange="autoSubmitImport()">
+        </div>
+    </form>
+
+    <!-- Экспорт -->
+    <div class="row">
+        <button type="button" onclick="chooseFileAndSave()">Выбрать файл и сохранить</button>
+    </div>
+
+</div>
+
+<script>
+
+    let selectedContact = null;
+
+    function autoSubmitImport() {
+        document.getElementById("importForm").submit();
+    }
+
+    async function chooseFileAndSave() {
+        try {
+            const handle = await window.showSaveFilePicker({
+                suggestedName: "contacts.csv",
+                types: [{
+                    description: "CSV файлы",
+                    accept: { "text/csv": [".csv"] }
+                }]
+            });
+
+            const response = await fetch(`/saveToFile`);
+            if (!response.ok) {
+                alert("Ошибка при получении файла с сервера!");
+                return;
+            }
+            const text = await response.text();
+
+            const writable = await handle.createWritable();
+            await writable.write(text);
+            await writable.close();
+
+            alert("Файл успешно сохранён!");
+
+        } catch (error) {
+            console.error(error);
+            alert("Ошибка при сохранении файла!");
+        }
+    }
+
+    // Выделение строки
+    function selectContact(element) {
+        if (selectedContact) {
+            selectedContact.classList.remove("selected");
+        }
+        selectedContact = element;
+        selectedContact.classList.add("selected");
+    }
+
+    function clearContacts() {
+        const form = document.createElement('form');
+        form.method = 'post';
+        form.action = '/clear';
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function openEditModal() {
+        if (!selectedContact) {
+            alert("Выберите контакт для редактирования!");
+            return;
+        }
+
+        const oldName = selectedContact.querySelector("td:first-child").innerText;
+        const oldPhone = selectedContact.querySelector("td:last-child").innerText;
+
+        document.getElementById("oldName").value = oldName;
+        document.getElementById("oldPhone").value = oldPhone;
+        document.getElementById("newName").value = oldName;
+        document.getElementById("newPhone").value = oldPhone;
+
+        document.getElementById("editModal").style.display = "block";
+    }
+
+    function closeEditModal() {
+        document.getElementById("editModal").style.display = "none";
+    }
+
+
+    // Удаление выбранного контакта
+    function deleteSelected() {
+        if (selectedContact) {
+            const name = selectedContact.querySelector('td:first-child').innerText;
+            const phone = selectedContact.querySelector('td:last-child').innerText;
+
+            const form = document.createElement('form');
+            form.method = 'post';
+            form.action = '/delete';
+            console.log(form);
+
+            const nameInput = document.createElement('input');
+            nameInput.type = 'hidden';
+            nameInput.name = 'name';
+            nameInput.value = name;
+            form.appendChild(nameInput);
+
+            const phoneInput = document.createElement('input');
+            phoneInput.type = 'hidden';
+            phoneInput.name = 'phone';
+            phoneInput.value = phone;
+            form.appendChild(phoneInput);
+
+            document.body.appendChild(form);
+            form.submit();
+        } else {
+            alert("Выберите контакт для удаления!");
+        }
+    }
+
+</script>
+</body>
+</html>

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class HelpController {
     @GetMapping("/help")
-    public String get() {
+    public String help() {
         return "help";
     }
 }

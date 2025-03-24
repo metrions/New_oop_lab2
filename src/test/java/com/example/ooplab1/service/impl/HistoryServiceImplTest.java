@@ -1,7 +1,5 @@
 package com.example.ooplab1.service.impl;
 
-import com.example.ooplab1.model.History;
-import com.example.ooplab1.model.RecordHistory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
