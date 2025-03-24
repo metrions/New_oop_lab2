@@ -4,7 +4,7 @@ import com.example.ooplab1.model.UAbonent;
 
 import java.util.List;
 
-public interface UAbonementService {
+public interface UAbonentService {
     List<UAbonent> findAll();
     List<UAbonent> findAll(String name, String phone);
     UAbonent findAbonent(UAbonent abonent);

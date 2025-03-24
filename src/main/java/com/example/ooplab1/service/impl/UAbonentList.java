@@ -9,7 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Component
-public class UAbonentList implements UAbonementService {
+public class UAbonentList implements UAbonentService {
     public final List<UAbonent> abonentList;
 
     public UAbonentList() {
@@ -88,5 +88,4 @@ public class UAbonentList implements UAbonementService {
         sort();
         return uAbonent;
     }
-
 }

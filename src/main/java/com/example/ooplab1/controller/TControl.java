@@ -15,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Controller
 @RequiredArgsConstructor
 public class TControl {
-
     private final UAbonentList uAbonentList;
     private final FileServiceImpl fileServiceImpl;
 
@@ -58,7 +57,6 @@ public class TControl {
         return "redirect:/";
     }
 
-
     // Поиск контакта по имени
     @PostMapping("/search")
     public String searchContact(@RequestParam(required = false) String name,
@@ -79,6 +77,4 @@ public class TControl {
         fileServiceImpl.importCSV(file);
         return "redirect:/";
     }
-
-
 }
